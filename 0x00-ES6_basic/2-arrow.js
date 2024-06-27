@@ -3,7 +3,7 @@ export default function getSumOfHoods() {
 
     const self = this;
     this.addNeighborhood = (newNeighborhood) => {
-        self.sanFranciscoNeighnorhoods.push(newNeighborhood);
-        return self.sanFranciscoNeighborhoods;
+        self.sanFranciscoNeighborhoods.push(newNeighborhood);
+        return self.SanFranciscoNeighborhoods;
     };
 }
