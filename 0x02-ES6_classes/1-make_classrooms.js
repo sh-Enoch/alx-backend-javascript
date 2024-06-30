@@ -4,7 +4,7 @@ export default function initializeRooms() {
   const rooms = [];
   const a = new ClassRoom(19);
   const b = new ClassRoom(20);
-  const c = new ClassRoom(24);
+  const c = new ClassRoom(34);
 
   rooms.push(a, b, c);
   return rooms;
