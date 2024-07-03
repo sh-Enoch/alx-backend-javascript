@@ -1,4 +1,4 @@
-interface Teacher {
+export default interface Teacher {
     firstName: string;
     lastName: string;
     fullTimeEmployee: boolean;
@@ -7,11 +7,11 @@ interface Teacher {
     [propName: string]: any;
 }
 
-interface Director extends Teacher {
+export default interface Director extends Teacher {
     numberOfReports: number;
 }
 
-interface printTeacher {
+export default interface printTeacher {
     (firstName: string, lastName: string): string ;
 }
 
