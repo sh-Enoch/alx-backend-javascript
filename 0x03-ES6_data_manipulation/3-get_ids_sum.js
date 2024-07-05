@@ -3,4 +3,5 @@ export default function getStudentIdsSum(listOfStudents) {
         return accumulator + item.id;
 
     }, 0)
+    return sumOfIds;
 }
