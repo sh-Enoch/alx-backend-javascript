@@ -13,7 +13,7 @@ app.get('/students', (req, res) => {
   res.set('Content-Type', 'text/plain');
   res.write('This is the list of our students\n');
 
-  // Check if a file path is provided
+  // Ensure the file path is provided
   if (!argv[2]) {
     res.status(400).send('Database file path not provided');
     return;
@@ -26,43 +26,44 @@ app.get('/students', (req, res) => {
       return;
     }
 
-    const lines = data.split('\n').filter((line) => line.trim() !== '');
-    if (lines.length <= 1) {
-      res.status(500).send('Database is empty or invalid');
-      return;
-    }
-
-    const headers = lines[0].split(',');
-    const students = lines.slice(1).map((line) => {
-      const values = line.split(',');
-      if (values.length !== headers.length) {
-        return null; // Ignore malformed lines
+    try {
+      const lines = data.split('\n').filter((line) => line.trim() !== '');
+      if (lines.length <= 1) {
+        res.status(500).send('Database is empty or invalid');
+        return;
       }
-      return headers.reduce((student, header, index) => {
-        student[header.trim()] = values[index].trim();
-        return student;
-      }, {});
-    }).filter((student) => student !== null); // Remove null entries
 
-    res.write(`Number of students: ${students.length}\n`);
+      const students = [];
+      lines.slice(1).forEach((line) => {
+        const fields = line.split(',');
+        if (fields.length >= 4) {
+          students.push({ firstname: fields[0], field: fields[3] });
+        }
+      });
 
-    const fields = {};
-    students.forEach((student) => {
-      const field = student.field;
-      if (!fields[field]) fields[field] = [];
-      fields[field].push(student.firstname);
-    });
+      res.write(`Number of students: ${students.length}\n`);
 
-    Object.keys(fields).forEach((field) => {
-      const studentNames = fields[field].join(', ');
-      res.write(`Number of students in ${field}: ${fields[field].length}. List: ${studentNames}\n`);
-    });
+      const fieldGroups = {};
+      students.forEach((student) => {
+        if (!fieldGroups[student.field]) fieldGroups[student.field] = [];
+        fieldGroups[student.field].push(student.firstname);
+      });
 
-    res.end();
+      Object.keys(fieldGroups).forEach((field) => {
+        const studentNames = fieldGroups[field].join(', ');
+        res.write(
+          `Number of students in ${field}: ${fieldGroups[field].length}. List: ${studentNames}\n`
+        );
+      });
+
+      res.end();
+    } catch (error) {
+      res.status(500).send('An error occurred while processing the database');
+    }
   });
 });
 
-// Listen on port 1245
+// Start the server
 app.listen(1245);
 
 module.exports = app;
