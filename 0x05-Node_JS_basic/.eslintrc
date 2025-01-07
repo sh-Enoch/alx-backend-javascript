@@ -1,0 +1,11 @@
+{
+  "plugins": [
+    // Remove "jest" if not required
+    "jest"
+  ],
+  "rules": {
+    // Remove or disable the problematic rule
+    "jest/unbound-method": "off"
+  }
+}
+

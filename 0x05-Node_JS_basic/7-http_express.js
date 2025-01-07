@@ -1,28 +1,27 @@
 const express = require('express');
 const fs = require('fs').promises;
 
-const countStudents = (path) =>
-  fs.readFile(path, 'utf8')
-    .then((data) => {
-      const lines = data.trim().split('\n').filter(Boolean);
-      if (lines.length <= 1) {
-        throw new Error('No student data found in the database');
-      }
+const countStudents = (path) => fs.readFile(path, 'utf8')
+  .then((data) => {
+    const lines = data.trim().split('\n').filter(Boolean);
+    if (lines.length <= 1) {
+      throw new Error('No student data found in the database');
+    }
 
-      const fields = {};
-      for (const line of lines.slice(1)) {
-        const student = line.split(',');
-        if (!fields[student[3]]) {
-          fields[student[3]] = [];
-        }
-        fields[student[3]].push(student[0]);
+    const fields = {};
+    for (const line of lines.slice(1)) {
+      const student = line.split(',');
+      if (!fields[student[3]]) {
+        fields[student[3]] = [];
       }
+      fields[student[3]].push(student[0]);
+    }
 
-      return { lines, fields };
-    })
-    .catch(() => {
-      throw new Error('Cannot load the database');
-    });
+    return { lines, fields };
+  })
+  .catch(() => {
+    throw new Error('Cannot load the database');
+  });
 
 const app = express();
 
@@ -50,6 +49,3 @@ app.listen(1245, () => {
 });
 
 module.exports = app;
-
-
-
