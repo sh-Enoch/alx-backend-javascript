@@ -1,18 +1,22 @@
-const expect = require("chai").expect;
-// import sinon
-const sinon = require("sinon");
-const sendPaymentRequestToApi = require('./4-payment.js');
-const utils = require('./utils.js');
+const { expect } = require('chai');
+const sinon = require('sinon');
+const Utils = require('./utils');
+const sendPaymentRequestToApi = require('./4-payment');
 
+describe('sendPaymentRequestToApi', () => {
+	it('should call Util.calculateNumber', () => {
+		const functionStub = sinon.stub(Utils, 'calculateNumber').returns(10);
 
-describe('stub', function() {
-  it('it message', function() {
-    let mySpy = sinon.spy(console, 'log');
-    let myStub = sinon.stub(utils, 'calculateNumber').returns(10);
-    sendPaymentRequestToApi(100, 20);
-    expect(myStub.calledWith('SUM', 100, 20)).to.be.true;
-    expect(mySpy.calledWith('The total is: 10')).to.be.true;
-    mySpy.restore();
-    myStub.restore();
-  });
+		const consoleSpy = sinon.spy(console, 'log');
+
+		const paymentRequest = sendPaymentRequestToApi(100, 20);
+
+		expect(functionStub.calledWithExactly('SUM', 100, 20)).to.true;
+		expect(consoleSpy.calledWithExactly('The total is: 10')).to.true;
+		expect(consoleSpy.calledOnce).to.true;
+		expect(Utils.calculateNumber(100, 20)).to.equal(10);
+
+		functionStub.restore();
+		consoleSpy.restore();
+	});
 });
