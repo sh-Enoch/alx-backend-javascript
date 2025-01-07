@@ -6,34 +6,64 @@ const app = express();
 
 app.get('/', (req, res) => {
   res.set('Content-Type', 'text/plain');
-  res.send('Hello Holberton School!');
+  res.send('Hello ALX!');
 });
 
 app.get('/students', (req, res) => {
   res.set('Content-Type', 'text/plain');
   res.write('This is the list of our students\n');
+
+  // Check if a file path is provided
+  if (!argv[2]) {
+    res.status(400).send('Database file path not provided');
+    return;
+  }
+
+  // Read the file asynchronously
   fs.readFile(argv[2], 'utf8', (err, data) => {
     if (err) {
-      throw Error('Cannot load the database');
+      res.status(500).send('Cannot load the database');
+      return;
     }
-    const result = [];
-    data.split('\n').forEach((data) => {
-      result.push(data.split(','));
+
+    const lines = data.split('\n').filter((line) => line.trim() !== '');
+    if (lines.length <= 1) {
+      res.status(500).send('Database is empty or invalid');
+      return;
+    }
+
+    const headers = lines[0].split(',');
+    const students = lines.slice(1).map((line) => {
+      const values = line.split(',');
+      if (values.length !== headers.length) {
+        return null; // Ignore malformed lines
+      }
+      return headers.reduce((student, header, index) => {
+        student[header.trim()] = values[index].trim();
+        return student;
+      }, {});
+    }).filter((student) => student !== null); // Remove null entries
+
+    res.write(`Number of students: ${students.length}\n`);
+
+    const fields = {};
+    students.forEach((student) => {
+      const field = student.field;
+      if (!fields[field]) fields[field] = [];
+      fields[field].push(student.firstname);
     });
-    result.shift();
-    const newis = [];
-    result.forEach((data) => newis.push([data[0], data[3]]));
-    const fields = new Set();
-    newis.forEach((item) => fields.add(item[1]));
-    const final = {};
-    fields.forEach((data) => { (final[data] = 0); });
-    newis.forEach((data) => { (final[data[1]] += 1); });
-    res.write(`Number of students: ${result.filter((check) => check.length > 3).length}\n`);
-    Object.keys(final).forEach((data) => res.write(`Number of students in ${data}: ${final[data]}. List: ${newis.filter((n) => n[1] === data).map((n) => n[0]).join(', ')}\n`));
+
+    Object.keys(fields).forEach((field) => {
+      const studentNames = fields[field].join(', ');
+      res.write(`Number of students in ${field}: ${fields[field].length}. List: ${studentNames}\n`);
+    });
+
     res.end();
   });
 });
 
+// Listen on port 1245
 app.listen(1245);
 
 module.exports = app;
+
